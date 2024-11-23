@@ -49,5 +49,3 @@ coverage/
 *.rej
 *.zip
 
-# Ignore uploads (if you don't want to track uploaded files in Git)
-uploads/
