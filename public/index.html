@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Uploader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .upload-box {
+            border: 2px dashed #aaa;
+            border-radius: 10px;
+            width: 400px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            text-align: center;
+            color: #666;
+            transition: border-color 0.3s;
+        }
+
+        .upload-box.dragover {
+            border-color: #00bfff;
+            color: #00bfff;
+        }
+
+        #progress-container {
+            margin-top: 10px;
+            width: 100%;
+            display: none;
+        }
+
+        progress {
+            width: 100%;
+            height: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .link {
+            margin-top: 10px;
+            color: #007bff;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <div id="upload-box" class="upload-box">
+        Drag and drop a file here or click to upload
+    </div>
+    <input type="file" id="file-input" class="hidden">
+    <div id="progress-container">
+        <progress id="progress-bar" max="100" value="0"></progress>
+    </div>
+    <button id="upload-btn" class="hidden">Upload File</button>
+    <div id="link-container" class="hidden">
+        <p>Your file has been uploaded! Share this link:</p>
+        <a id="file-link" class="link" href="#" target="_blank"></a>
+    </div>
+</div>
+
+<script>
+    const uploadBox = document.getElementById('upload-box');
+    const fileInput = document.getElementById('file-input');
+    const progressBar = document.getElementById('progress-bar');
+    const progressContainer = document.getElementById('progress-container');
+    const uploadBtn = document.getElementById('upload-btn');
+    const linkContainer = document.getElementById('link-container');
+    const fileLink = document.getElementById('file-link');
+
+    let selectedFile;
+
+    // Drag and drop events
+    uploadBox.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadBox.classList.add('dragover');
+    });
+
+    uploadBox.addEventListener('dragleave', () => {
+        uploadBox.classList.remove('dragover');
+    });
+
+    uploadBox.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadBox.classList.remove('dragover');
+        selectedFile = e.dataTransfer.files[0];
+        showUploadButton();
+    });
+
+    // Click to upload
+    uploadBox.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+        selectedFile = e.target.files[0];
+        showUploadButton();
+    });
+
+    // Show upload button when a file is selected
+    function showUploadButton() {
+        if (selectedFile) {
+            uploadBox.textContent = `Selected file: ${selectedFile.name}`;
+            uploadBtn.classList.remove('hidden');
+        }
+    }
+
+    // Upload file
+    uploadBtn.addEventListener('click', async () => {
+        if (!selectedFile) return;
+
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+
+        progressContainer.style.display = 'block';
+
+        try {
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData,
+                onUploadProgress: (event) => {
+                    if (event.lengthComputable) {
+                        const percentComplete = (event.loaded / event.total) * 100;
+                        progressBar.value = percentComplete;
+                    }
+                },
+            });
+
+            const data = await response.json();
+            if (data.fileUrl) {
+                linkContainer.classList.remove('hidden');
+                fileLink.href = data.fileUrl;
+                fileLink.textContent = data.fileUrl;
+            }
+        } catch (error) {
+            console.error('Error uploading file:', error);
+        }
+    });
+</script>
+</body>
+</html>

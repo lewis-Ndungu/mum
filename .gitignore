@@ -1,0 +1,53 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+bower_components/
+
+# Build output
+dist/
+build/
+.cache/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
+*.lock
+*.pid
+*.seed
+*.pid.lock
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# Coverage reports
+coverage/
+
+# npm package files
+*.tgz
+
+# Miscellaneous
+.sass-cache/
+*.bak
+*.orig
+*.rej
+*.zip
+
+# Ignore uploads (if you don't want to track uploaded files in Git)
+uploads/
